@@ -18,11 +18,12 @@
 	<div class="food"></div>
 </div>
 <script type="text/javascript">
-	var snakeLeft=384;				//贪吃蛇最初距离最左边的位置
-	var snakeTop=300;				//贪吃蛇最初距离最上面的位置
-	var keyCode=null;					//记录前一次触发事件按下的键盘代码
-	var speed=10;					//此值越小贪吃蛇越快
-	var timeoutFlag;
+	var snakeLeft;				//贪吃蛇最初距离最左边的位置
+	var snakeTop;				//贪吃蛇最初距离最上面的位置
+	var keyCode;					//记录前一次触发事件按下的键盘代码
+	var speed;					//此值越小贪吃蛇越快
+	var timeoutFlag;			//用于保存timeout的返回值以便终止该函数的运行
+	var food={}            //用于保存食物对象
 	init();
 	//console.info($(".snake"));
 	document.addEventListener("keydown", function(event){
@@ -45,6 +46,10 @@
 	})
 	//初始化贪吃蛇，包括位置，颜色等等
 	function init(){
+		snakeLeft=384;	
+		snakeTop=300;
+		keyCode=null;
+		speed=10;
 		$(".snake").css("background","black");
 		$(".snake").css("width","15px");
 		$(".snake").css("height","15px");
@@ -91,9 +96,12 @@
 		console.info("Y坐标为"+snakeTop);
 		if (snakeLeft>790 || snakeLeft<0 || snakeTop<8  || snakeTop>560) {
 			alert("你狗带了！");
-			clearTimeout(timeoutFlag);
-			$(".snake").css("left","384px");
-			$(".snake").css("top","300px");
+			if(confirm("是否重新开始游戏？")){
+				clearTimeout(timeoutFlag);
+				init();
+			}else{
+				window.close(); 
+			}
 			return;
 		}
 		setTimeout(godie, 20);
@@ -102,6 +110,7 @@
 	function placeFood(num){
 		var xplace;
 		var yplace;
+		var effect;
 	   for(var i=0;i<num;i++){
 	   		xplace=Math.random()*790;
 	   		yplace=Math.random()*560+8;
@@ -112,8 +121,43 @@
 			$(".food"+i).css("position","fixed");
 			$(".food"+i).css("left",xplace+"px");
 			$(".food"+i).css("top",yplace+"px");
+			var food=new food();
+			food.xPlace=xPlace;
+			food.yPlace=yPlace;
+			if(Math.random()*10>5){
+
+			}else{
+
+			}
+
 	   }
 	}
+	//创建食物对象
+	function food(){
+		vat food=new Object();
+		food.xPlace;  
+		food.yPlace;
+		food.effect;  //记录食物的效果，是增一节，还是减一节，还是加速度，减速度，亦或是直接狗带
+	}
+	//随机生成效果
+	/* 
+	70%是好效果
+		60%加10分和一节
+		40%减速度
+	30%是坏效果
+		60%减20分
+		30%加速度
+		10%直接狗带
+	*/
+	function randomEffect(){
+		//有70%是好效果
+		if(Math.random()*10>3){
+			if()
+		}else{
+
+		}
+	}
 </script>
+
 </body>
 </html>
