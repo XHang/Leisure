@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>js游戏</title>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="jquery-3.1.1.min.js"></script>
+	<style type="text/css">
+		.yaer{
+			background: forestgreen;
+			width: 800px;
+			height: 570px;
+		}
+	</style>
+</head>
+<body>
+<div class="yaer">
+	<div class="snake"></div>
+	<div class="food"></div>
+</div>
+<script type="text/javascript">
+	var snakeLeft=384;				//贪吃蛇最初距离最左边的位置
+	var snakeTop=300;				//贪吃蛇最初距离最上面的位置
+	var keyCode=null;					//记录前一次触发事件按下的键盘代码
+	var speed=10;					//此值越小贪吃蛇越快
+	var timeoutFlag;
+	init();
+	//console.info($(".snake"));
+	document.addEventListener("keydown", function(event){
+		if(event.keyCode==38 && 38!=keyCode){
+			//console.info("上")
+			run("up");
+		}else if(event.keyCode==40 && 40!=keyCode){
+			//console.info("下");
+			run("dowm");
+		}
+		else if(event.keyCode==37 && 37!=keyCode){
+			//console.info("左")
+			run("left");
+		}
+		else if(event.keyCode==39 && 39!=keyCode){
+			//console.info("右");
+			run("right");
+		}
+		keyCode=event.keyCode;
+	})
+	//初始化贪吃蛇，包括位置，颜色等等
+	function init(){
+		$(".snake").css("background","black");
+		$(".snake").css("width","15px");
+		$(".snake").css("height","15px");
+		$(".snake").css("position","fixed");
+		$(".snake").css("left",snakeLeft+"px");
+		$(".snake").css("top",snakeTop+"px");
+		 godie();
+		 placeFood(5);
+	}
+	//选择方向，跑下去
+	function run(fangxiang){
+		clearTimeout(timeoutFlag);			//换了一个方向，原先的方向速度停止
+		switch(fangxiang){
+			case "up" : upRun(); break;
+			case "dowm" : downRun(); break;
+			case "right" : rightRun(); break;
+			case "left" : leftRun(); break;
+
+		}
+	}
+	//向左一直跑
+	function leftRun(){
+		$(".snake").css("left",(snakeLeft--)+"px");
+		timeoutFlag=setTimeout(leftRun, speed);
+	}
+	//向右一直跑
+	function rightRun(){
+		$(".snake").css("left",(snakeLeft++)+"px");
+		timeoutFlag=setTimeout(rightRun, speed);
+	}
+	//向上一直跑
+	function upRun(){
+		$(".snake").css("top",(snakeTop--)+"px");
+		timeoutFlag=setTimeout(upRun, speed);
+	}
+	//向下一直跑
+	function downRun(){
+		$(".snake").css("top",(snakeTop++)+"px");
+		timeoutFlag=setTimeout(downRun, speed);
+	}
+	//每20ms查询一次是否过境
+	function godie(){
+		console.info("x坐标为"+snakeLeft);
+		console.info("Y坐标为"+snakeTop);
+		if (snakeLeft>790 || snakeLeft<0 || snakeTop<8  || snakeTop>560) {
+			alert("你狗带了！");
+			clearTimeout(timeoutFlag);
+			$(".snake").css("left","384px");
+			$(".snake").css("top","300px");
+			return;
+		}
+		setTimeout(godie, 20);
+	}
+	//生成指定数食物，位置随机放置
+	function placeFood(num){
+		var xplace;
+		var yplace;
+	   for(var i=0;i<num;i++){
+	   		xplace=Math.random()*790;
+	   		yplace=Math.random()*560+8;
+	   		$(".snake").append("<div class='food"+i+"'></div>");
+	   		$(".food"+i).css("background","red");
+			$(".food"+i).css("width","5px");
+			$(".food"+i).css("height","5px");
+			$(".food"+i).css("position","fixed");
+			$(".food"+i).css("left",xplace+"px");
+			$(".food"+i).css("top",yplace+"px");
+	   }
+	}
+</script>
+</body>
+</html>
