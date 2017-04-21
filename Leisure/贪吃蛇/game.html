@@ -18,12 +18,19 @@
 	<div class="food"></div>
 </div>
 <script type="text/javascript">
+//创建食物对象
+	function Food(){
+		var food={};
+		food.xPlace;  
+		food.yPlace;
+		food.effect;  //记录食物的效果，是增一节，还是减一节，还是加速度，减速度，亦或是直接狗带
+	}
 	var snakeLeft;				//贪吃蛇最初距离最左边的位置
 	var snakeTop;				//贪吃蛇最初距离最上面的位置
 	var keyCode;					//记录前一次触发事件按下的键盘代码
 	var speed;					//此值越小贪吃蛇越快
 	var timeoutFlag;			//用于保存timeout的返回值以便终止该函数的运行
-	var food={}            //用于保存食物对象
+	var foods={}            //用于保存食物对象
 	init();
 	//console.info($(".snake"));
 	document.addEventListener("keydown", function(event){
@@ -56,8 +63,8 @@
 		$(".snake").css("position","fixed");
 		$(".snake").css("left",snakeLeft+"px");
 		$(".snake").css("top",snakeTop+"px");
-		 godie();
-		 placeFood(5);
+		 godie();					//启动死亡监听
+		 placeFood(2);				//随机放置食物
 	}
 	//选择方向，跑下去
 	function run(fangxiang){
@@ -95,14 +102,7 @@
 		console.info("x坐标为"+snakeLeft);
 		console.info("Y坐标为"+snakeTop);
 		if (snakeLeft>790 || snakeLeft<0 || snakeTop<8  || snakeTop>560) {
-			alert("你狗带了！");
-			if(confirm("是否重新开始游戏？")){
-				clearTimeout(timeoutFlag);
-				init();
-			}else{
-				window.close(); 
-			}
-			return;
+			die();
 		}
 		setTimeout(godie, 20);
 	}
@@ -121,24 +121,14 @@
 			$(".food"+i).css("position","fixed");
 			$(".food"+i).css("left",xplace+"px");
 			$(".food"+i).css("top",yplace+"px");
-			var food=new food();
-			food.xPlace=xPlace;
-			food.yPlace=yPlace;
-			if(Math.random()*10>5){
-
-			}else{
-
-			}
-
+			var food=new Food();
+			food.xPlace=xplace;
+			food.yPlace=yplace;
+			food.effect= randomEffect();
+			foods[i]=food;
 	   }
 	}
-	//创建食物对象
-	function food(){
-		vat food=new Object();
-		food.xPlace;  
-		food.yPlace;
-		food.effect;  //记录食物的效果，是增一节，还是减一节，还是加速度，减速度，亦或是直接狗带
-	}
+	
 	//随机生成效果
 	/* 
 	70%是好效果
@@ -152,12 +142,48 @@
 	function randomEffect(){
 		//有70%是好效果
 		if(Math.random()*10>3){
-			if()
+			if(Math.random()*10>6){
+				return "slowing";
+			}else{
+				return "normal";
+			}
 		}else{
+			if (Math.random()*10>6) {
+				return "Minus20"
+			}else if (Math.random()*10>3) {
+				return "addSpeed";
+			}else{
+				return "godiel";
+			}
 
+		}
+	}
+	//死亡处理
+	function die(){
+		alert("你狗带了！");
+		if(confirm("是否重新开始游戏？")){
+			clearTimeout(timeoutFlag);
+			init();
+		}else{
+			window.close(); 
+		}
+		return;
+	}
+	//监听蛇是否吃到食物了
+	function listenEat(){
+		for (var i = 0; i <foods.size(); i++) {
+			if(snakeLeft>foods[i].xPlace && snakeLeft<foods[i].xPlace+5 && snakeTop>foods[i] && snakeTop<foods[i]+5){
+				addEffect(foods[i]);
+			}
+		}
+		setTimeout(listenEat, 20);
+	}
+	//为贪吃蛇添加效果
+	function addEffect(food){
+		switch (food.effect){
+			case "normal": $("");
 		}
 	}
 </script>
 
 </body>
-</html>
