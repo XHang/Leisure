@@ -1,38 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
+<!--贪吃蛇食物会跑-->
 	<title>js游戏</title>
 	<meta charset="utf-8">
 	<script type="text/javascript" src="jquery-3.1.1.min.js"></script>
+	<script type="text/javascript" src="lib.js"></script>
 	<style type="text/css">
 		.yaer{
 			background: forestgreen;
 			width: 800px;
 			height: 570px;
 		}
+		table{
+			border:1px solid #000;
+			position: absolute;left: 300px;top: 300px;
+		}
+		.info{
+			border:1px solid #000;
+			width:400px;
+			height: 300px;
+			position: absolute;
+			left: 900px;top: 30px;
+		}
+		.msg{
+			position: relative;
+			left: 55px;
+			top: 60px;
+			color: blue;
+			display:block;
+		}
+		.score{
+			position: relative;
+			left: 20px;
+			top: 20px;
+			color: green;
+		}
 	</style>
+
 </head>
 <body>
 <div class="yaer">
 	<div class="snake"></div>
-	<div class="food"></div>
+</div>
+<div class="info">
+		<font class="score">目前得分为0分</font>
 </div>
 <script type="text/javascript">
-//创建食物对象
-	function Food(){
-		var food={};
-		food.xPlace;  
-		food.yPlace;
-		food.effect;  //记录食物的效果，是增一节，还是减一节，还是加速度，减速度，亦或是直接狗带
-	}
 	var snakeLeft;				//贪吃蛇最初距离最左边的位置
 	var snakeTop;				//贪吃蛇最初距离最上面的位置
 	var keyCode;					//记录前一次触发事件按下的键盘代码
 	var speed;					//此值越小贪吃蛇越快
 	var timeoutFlag;			//用于保存timeout的返回值以便终止该函数的运行
-	var foods={}            //用于保存食物对象
-	init();
-	//console.info($(".snake"));
+	var foods=[];            //用于保存食物对象
+	var snakeNodes=[];		//用于保存蛇的节点
+	var score=0;			//保存当前得分
+	snakeInit();			//初始化蛇
+
 	document.addEventListener("keydown", function(event){
 		if(event.keyCode==38 && 38!=keyCode){
 			//console.info("上")
@@ -49,27 +73,14 @@
 			//console.info("右");
 			run("right");
 		}
-		keyCode=event.keyCode;
+		keyCode=event.keyCode;					//记录前一个按键。下一个按键不能和前一个按键相同不会触发事件
 	})
-	//初始化贪吃蛇，包括位置，颜色等等
-	function init(){
-		snakeLeft=384;	
-		snakeTop=300;
-		keyCode=null;
-		speed=10;
-		$(".snake").css("background","black");
-		$(".snake").css("width","15px");
-		$(".snake").css("height","15px");
-		$(".snake").css("position","fixed");
-		$(".snake").css("left",snakeLeft+"px");
-		$(".snake").css("top",snakeTop+"px");
-		 godie();					//启动死亡监听
-		 placeFood(2);				//随机放置食物
-	}
+	
+	
 	//选择方向，跑下去
-	function run(fangxiang){
+	function run(direction){
 		clearTimeout(timeoutFlag);			//换了一个方向，原先的方向速度停止
-		switch(fangxiang){
+		switch(direction){
 			case "up" : upRun(); break;
 			case "dowm" : downRun(); break;
 			case "right" : rightRun(); break;
@@ -77,113 +88,34 @@
 
 		}
 	}
-	//向左一直跑
-	function leftRun(){
-		$(".snake").css("left",(snakeLeft--)+"px");
-		timeoutFlag=setTimeout(leftRun, speed);
-	}
-	//向右一直跑
-	function rightRun(){
-		$(".snake").css("left",(snakeLeft++)+"px");
-		timeoutFlag=setTimeout(rightRun, speed);
-	}
-	//向上一直跑
-	function upRun(){
-		$(".snake").css("top",(snakeTop--)+"px");
-		timeoutFlag=setTimeout(upRun, speed);
-	}
-	//向下一直跑
-	function downRun(){
-		$(".snake").css("top",(snakeTop++)+"px");
-		timeoutFlag=setTimeout(downRun, speed);
-	}
-	//每20ms查询一次是否过境
+	
+	//监听蛇的位置是否过界
 	function godie(){
-		console.info("x坐标为"+snakeLeft);
-		console.info("Y坐标为"+snakeTop);
+		//console.info("蛇头x坐标为"+snakeLeft);
+		//console.info("Y坐标为"+snakeTop);
 		if (snakeLeft>790 || snakeLeft<0 || snakeTop<8  || snakeTop>560) {
 			die();
 		}
 		setTimeout(godie, 20);
 	}
-	//生成指定数食物，位置随机放置
-	function placeFood(num){
-		var xplace;
-		var yplace;
-		var effect;
-	   for(var i=0;i<num;i++){
-	   		xplace=Math.random()*790;
-	   		yplace=Math.random()*560+8;
-	   		$(".snake").append("<div class='food"+i+"'></div>");
-	   		$(".food"+i).css("background","red");
-			$(".food"+i).css("width","5px");
-			$(".food"+i).css("height","5px");
-			$(".food"+i).css("position","fixed");
-			$(".food"+i).css("left",xplace+"px");
-			$(".food"+i).css("top",yplace+"px");
-			var food=new Food();
-			food.xPlace=xplace;
-			food.yPlace=yplace;
-			food.effect= randomEffect();
-			foods[i]=food;
-	   }
-	}
-	
-	//随机生成效果
-	/* 
-	70%是好效果
-		60%加10分和一节
-		40%减速度
-	30%是坏效果
-		60%减20分
-		30%加速度
-		10%直接狗带
-	*/
-	function randomEffect(){
-		//有70%是好效果
-		if(Math.random()*10>3){
-			if(Math.random()*10>6){
-				return "slowing";
-			}else{
-				return "normal";
-			}
-		}else{
-			if (Math.random()*10>6) {
-				return "Minus20"
-			}else if (Math.random()*10>3) {
-				return "addSpeed";
-			}else{
-				return "godiel";
-			}
-
-		}
-	}
-	//死亡处理
-	function die(){
-		alert("你狗带了！");
-		if(confirm("是否重新开始游戏？")){
-			clearTimeout(timeoutFlag);
-			init();
-		}else{
-			window.close(); 
-		}
-		return;
-	}
 	//监听蛇是否吃到食物了
 	function listenEat(){
-		for (var i = 0; i <foods.size(); i++) {
-			if(snakeLeft>foods[i].xPlace && snakeLeft<foods[i].xPlace+5 && snakeTop>foods[i] && snakeTop<foods[i]+5){
+		for (var i = 0; i <foods.length; i++) {
+			if(snakeLeft+15>foods[i].xPlace && snakeLeft<foods[i].xPlace+5 
+				&& snakeTop+15>foods[i].yPlace && snakeTop<foods[i].yPlace+5){
+				for(var j = 0; j <foods.length; j++){
+					$(foods[j].class).remove();
+				}
 				addEffect(foods[i]);
+				placeFood(2);
 			}
 		}
 		setTimeout(listenEat, 20);
 	}
-	//为贪吃蛇添加效果
-	function addEffect(food){
-		switch (food.effect){
-			case "normal": $("");
-		}
-	}
+	window.addEventListener("mousemove",function(event){
+		//console.info("鼠标移动的x坐标"+event.clientX);
+		//console.info("鼠标移动的y坐标"+event.clientY);
+	})
 </script>
 
 </body>
